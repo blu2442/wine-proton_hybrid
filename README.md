@@ -1,2 +1,267 @@
 # wine-proton_hybrid
 Dis mai wain pwoton hybwid instawer.  Pwease enjoy :3
+
+# wine-proton — looni edition
+
+A hybrid Wine/Proton installer that merges a custom Wine build directly over a [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom) (or vanilla Proton) base, producing a single ready-to-use compatibility tool.
+
+The result can be registered as a **Steam compatibility tool**, used **standalone** via `./proton run game.exe`, or pointed at by Lutris, Heroic, or Bottles.
+
+---
+
+## Why does this exist?
+
+Proton gives you DXVK, VKD3D-Proton, Steam integration, and protonfixes. Custom Wine builds (Wine-GE, TKG, Staging, etc.) give you bleeding-edge patches, specific game fixes, or experimental features not yet in Proton. This installer merges the two — Wine's binaries and libraries overlay Proton's, while Proton's DXVK, Steam DLLs, and Python launcher are preserved.
+
+---
+
+## Requirements
+
+| Tool | Notes |
+|------|-------|
+| `bash` 4+ | Ships with every modern distro |
+| `rsync` | Used for all tree copies |
+| `python3` | Required for Proton's Steam integration (Mode B) |
+| `file` | Used for ELF arch detection |
+| `find` | Standard GNU findutils |
+| `yad` or `zenity` | *Optional* — enables GUI file pickers and progress bar. Falls back to terminal prompts if neither is present. |
+
+Install missing deps on Debian/Ubuntu:
+```bash
+sudo apt install rsync python3 file yad
+```
+
+---
+
+## What you need before running
+
+1. **A custom Wine build** — a directory containing `bin/wine`. Supported layouts:
+   - Standard: `wine-build/bin/wine`
+   - Wine-GE: `wine-ge/files/bin/wine`
+   - Build output: `wine-src/dist/bin/wine`
+
+2. **A Proton or GE-Proton source** — your existing GE-Proton installation, e.g.:  
+   `~/.steam/steam/compatibilitytools.d/GE-Proton9-20/`
+
+3. *(Optional)* **A protonfixes directory** — a [protonfixes](https://github.com/nicowillis/protonfixes) or [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) source for per-game fixes. Auto-detected if present alongside your Wine build.
+
+---
+
+## Installation
+
+```bash
+git clone https://github.com/yourusername/wine-proton_looni
+cd wine-proton_looni
+chmod +x wine-proton_looni-unified-1.0.0.sh
+./wine-proton_looni-unified-1.0.0.sh
+```
+
+The installer will walk you through source selection, tool naming, and install destination — all inputs can also be passed as CLI flags for headless use (see below).
+
+---
+
+## Usage
+
+### Interactive (default)
+
+```bash
+./wine-proton_looni-unified-1.0.0.sh
+```
+
+You'll be prompted for:
+- Wine build directory
+- Proton/GE-Proton source directory
+- Tool name (default: `wine-proton_looni`)
+- protonfixes directory (optional, auto-detected)
+- Install destination (Steam / custom)
+
+All file pickers appear **before** the build starts, so the progress bar runs uninterrupted.
+
+### Headless / CLI
+
+All prompts can be bypassed with flags:
+
+```bash
+./wine-proton_looni-unified-1.0.0.sh \
+  --wine-src      ~/builds/wine-ge-custom \
+  --proton-src    ~/.steam/steam/compatibilitytools.d/GE-Proton9-20 \
+  --name          wine-ge-looni \
+  --install-mode  steam
+```
+
+| Flag | Description |
+|------|-------------|
+| `--wine-src <dir>` | Path to your custom Wine build |
+| `--proton-src <dir>` | Path to Proton/GE-Proton source |
+| `--name <name>` | Tool name (default: `wine-proton_looni`) |
+| `--install-mode <mode>` | `steam` · `steam-pick` · `custom` |
+| `--install-dir <dir>` | Parent directory for custom installs |
+| `--protonfixes-dir <dir>` | protonfixes source (umu-protonfixes, plain checkout, etc.) |
+| `--dry-run` | Print commands without executing |
+| `--verbose` | Echo every command as it runs |
+| `--debug` | Dump Proton lib/wine layout after install |
+| `--uninstall` | Remove a previously installed tool |
+
+---
+
+## Install destinations
+
+| Mode | Where it goes |
+|------|--------------|
+| `steam` | Auto-detects your `compatibilitytools.d` |
+| `steam-pick` | You pick the `compatibilitytools.d` manually |
+| `custom` | Any directory — use with Lutris, Heroic, Bottles, or standalone |
+
+After a Steam install, fully restart Steam (`killall -9 steam`) for the tool to appear in **Properties → Compatibility**.
+
+---
+
+## Standalone use (no Steam)
+
+```bash
+# Basic launch
+~/tools/wine-proton_looni/proton run /path/to/game.exe
+
+# Launcher-wrapped game (GTA IV, etc.)
+WINE_USE_START=1 ~/tools/wine-proton_looni/proton run /path/to/GTAIV.exe
+
+# Explicit Wine prefix
+LOONI_PREFIX=~/.prefixes/mygame \
+  ~/tools/wine-proton_looni/proton run /path/to/game.exe
+
+# Enable DXVK performance overlay
+DXVK_HUD=1 ~/tools/wine-proton_looni/proton run /path/to/game.exe
+
+# Full Wine debug log (written to /tmp/proton_<ExeName>.log)
+PROTON_LOG=1 ~/tools/wine-proton_looni/proton run /path/to/game.exe
+
+# DX12 game (opt-in — off by default to preserve vkd3d-proton)
+WINEDLLOVERRIDES="d3d12=n,b" ~/tools/wine-proton_looni/proton run /path/to/game.exe
+```
+
+### Wine prefix management
+
+Prefixes are managed per-game automatically. Priority order:
+
+| Variable | Behaviour |
+|----------|-----------|
+| `LOONI_PREFIX` | Use exactly this path — highest priority |
+| `WINEPREFIX` (if not `~/.wine`) | Inherited with a warning — consider using `LOONI_PREFIX` instead |
+| *(neither set)* | `~/.wine-proton/<ExeName>` — safe per-game default |
+
+> **Tip:** If you have `WINEPREFIX` set globally in `~/.bashrc`, all games will share one prefix and stomp on each other. Remove it from your shell profile and use `LOONI_PREFIX` for per-game control.
+
+---
+
+## protonfixes support
+
+The installer accepts any of the following as a protonfixes source:
+
+- A built [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) repo (includes bundled `unzip`, `cabextract`, `libmspack`)
+- A plain [protonfixes](https://github.com/nicowillis/protonfixes) checkout
+- Any directory containing a `protonfixes/` subfolder or `__init__.py`
+
+Auto-search paths (checked in order):
+```
+~/umu-protonfixes
+~/protonfixes
+~/projects/umu-protonfixes
+~/projects/protonfixes
+~/git/umu-protonfixes
+<wine-src-parent>/umu-protonfixes
+<proton-src>/protonfixes
+```
+
+---
+
+## Known limitations
+
+- **EAC / BattlEye games** (Elden Ring, Hunt: Showdown, etc.) require a live Steam session and cannot run standalone through this tool. Use through Steam normally.
+- **DX12 games** need `WINEDLLOVERRIDES="d3d12=n,b"` if your Wine build doesn't ship its own `d3d12.dll`. Left off by default to avoid breaking games that depend on Proton's vkd3d-proton.
+- **32-bit-only games** require `WINEARCH=win32` and a 32-bit Wine prefix.
+
+---
+
+## Uninstalling
+
+```bash
+# Steam install (auto-detected)
+./wine-proton_looni-unified-1.0.0.sh --uninstall --name wine-proton_looni
+
+# Custom install location
+./wine-proton_looni-unified-1.0.0.sh --uninstall --name wine-proton_looni \
+  --install-dir ~/tools
+```
+
+The uninstaller reads the `.looni-install` receipt written into the tool directory to confirm what it's removing, then prompts for confirmation before deleting anything.
+
+---
+
+## How the build works
+
+```
+Proton/GE-Proton base  (rsync copy into staging)
+        │
+        ▼
+Wine DLLs overlay      (.dll  →  lib/wine/x86_64-windows/)
+Wine .so overlay       (.so   →  lib/wine/x86_64-unix/)
+Wine binaries          (wine, wineserver, wine-preloader  →  bin/)
+Wine libraries         (lib/*.so*, lib64/*.so*)
+        │
+        ▼
+Restore Proton originals:
+  • DXVK (d3d9/10/11/dxgi via cp -n — Wine files take precedence)
+  • Steam DLLs (lsteamclient, steamclient, vrclient, openvr_api)
+  • default_pfx (symlinks materialised into real files)
+        │
+        ▼
+protonfixes module installed
+Steam manifests written (compatibilitytool.vdf, toolmanifest.vdf)
+Install receipt written (.looni-install)
+        │
+        ▼
+Staged build → final install path
+Launch wrapper written (proton)
+Permissions fixed
+Verified
+```
+
+---
+
+## Install receipt
+
+Every successful install writes a `.looni-install` file into the tool directory:
+
+```ini
+installer_version="1.0.0"
+install_date="2026-03-07 21:45:17 UTC"
+tool_name="wine-proton_looni"
+install_path="/home/user/.steam/steam/compatibilitytools.d/wine-proton_looni"
+install_mode="steam"
+wine_src="/home/user/builds/wine-ge-custom"
+proton_src="/home/user/.steam/steam/compatibilitytools.d/GE-Proton9-20"
+proton_version="GE-Proton9-20"
+protonfixes_src="/home/user/umu-protonfixes"
+```
+
+This file is used by `--uninstall` and is useful for auditing what's installed and reproducing a build.
+
+---
+
+## Contributing
+
+Issues and PRs welcome. If you have a game that needs a specific fix or a Wine layout that isn't detected correctly, please open an issue with:
+- Your Wine build name and source
+- The Proton/GE-Proton version
+- The layout of your Wine directory (`ls -la <wine-dir>/`)
+- Any error or warning output from the installer
+
+---
+
+## Credits
+
+Built on top of [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom) by GloriousEggroll, [DXVK](https://github.com/doitsujin/dxvk), [VKD3D-Proton](https://github.com/HansKristian-Work/vkd3d-proton), [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes), and the broader Wine project.
+
+---
+
+*looni edition — made with love :3*
