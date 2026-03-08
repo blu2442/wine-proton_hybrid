@@ -1,7 +1,4 @@
-# wine-proton_hybrid
-Dis mai wain pwoton hybwid instawer.  Pwease enjoy :3
-
-# wine-proton — looni edition
+# wine-proton — looni edition  `v1.0.0`
 
 A hybrid Wine/Proton installer that merges a custom Wine build directly over a [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom) (or vanilla Proton) base, producing a single ready-to-use compatibility tool.
 
@@ -40,6 +37,8 @@ sudo apt install rsync python3 file yad
    - Wine-GE: `wine-ge/files/bin/wine`
    - Build output: `wine-src/dist/bin/wine`
 
+   > **⚠ Architecture warning:** Wine 10.6+ introduced a "unified WoW64" build where a single `wine` binary handles both 32-bit and 64-bit processes. This has a known crash with games that have 32-bit launchers under the Steam Runtime (page fault at `0x00006FFFF...`, Wine debugger opens immediately). Use a **split build** — one that ships a real `wine64` binary alongside `wine` — until the unified WoW64 layer matures. Build with `--enable-archs=i386,x86_64` if compiling yourself. The installer will detect and warn you if a unified build is provided.
+
 2. **A Proton or GE-Proton source** — your existing GE-Proton installation, e.g.:  
    `~/.steam/steam/compatibilitytools.d/GE-Proton9-20/`
 
@@ -50,10 +49,10 @@ sudo apt install rsync python3 file yad
 ## Installation
 
 ```bash
-git clone https://github.com/blu2442/wine-proton_looni
+git clone https://github.com/yourusername/wine-proton_looni
 cd wine-proton_looni
-chmod +x wine-proton_looni-unified-1.0.0.sh
-./wine-proton_looni-unified-1.0.0.sh
+chmod +x wine-proton_looni-unified.sh
+./wine-proton_looni-unified.sh
 ```
 
 The installer will walk you through source selection, tool naming, and install destination — all inputs can also be passed as CLI flags for headless use (see below).
@@ -65,7 +64,7 @@ The installer will walk you through source selection, tool naming, and install d
 ### Interactive (default)
 
 ```bash
-./wine-proton_looni-unified-1.0.0.sh
+./wine-proton_looni-unified.sh
 ```
 
 You'll be prompted for:
@@ -82,7 +81,7 @@ All file pickers appear **before** the build starts, so the progress bar runs un
 All prompts can be bypassed with flags:
 
 ```bash
-./wine-proton_looni-unified-1.0.0.sh \
+./wine-proton_looni-unified.sh \
   --wine-src      ~/builds/wine-ge-custom \
   --proton-src    ~/.steam/steam/compatibilitytools.d/GE-Proton9-20 \
   --name          wine-ge-looni \
@@ -176,8 +175,28 @@ Auto-search paths (checked in order):
 
 ## Known limitations
 
+### ⚠ Unified WoW64 (Wine 10.6+)
+
+Wine 10.6+ builds using the unified WoW64 architecture (single `wine` binary, no real `wine64`) have a known crash under the Steam Runtime with games that have 32-bit launchers — even if the main game executable is 64-bit. The symptom is:
+
+```
+wine: Unhandled page fault at address 00006FFFFFC0D8A7 (thread 0024), starting debugger...
+```
+
+The fault happens at the WoW64 address space boundary during the launcher's process init, before any game code runs. The installer detects this and warns you at build time.
+
+**Fix:** use a Wine build that ships a separate `wine64` binary (split layout). If building Wine yourself, use `--enable-archs=i386,x86_64` instead of the unified `--enable-archs=x86_64` flag. Wine 10.5 and earlier, and most Wine-GE builds up to this point, use the split layout and are unaffected.
+
+### EAC / BattlEye
+
 - **EAC / BattlEye games** (Elden Ring, Hunt: Showdown, etc.) require a live Steam session and cannot run standalone through this tool. Use through Steam normally.
+
+### DX12
+
 - **DX12 games** need `WINEDLLOVERRIDES="d3d12=n,b"` if your Wine build doesn't ship its own `d3d12.dll`. Left off by default to avoid breaking games that depend on Proton's vkd3d-proton.
+
+### 32-bit games
+
 - **32-bit-only games** require `WINEARCH=win32` and a 32-bit Wine prefix.
 
 ---
@@ -186,10 +205,10 @@ Auto-search paths (checked in order):
 
 ```bash
 # Steam install (auto-detected)
-./wine-proton_looni-unified-1.0.0.sh --uninstall --name wine-proton_looni
+./wine-proton_looni-unified.sh --uninstall --name wine-proton_looni
 
 # Custom install location
-./wine-proton_looni-unified-1.0.0.sh --uninstall --name wine-proton_looni \
+./wine-proton_looni-unified.sh --uninstall --name wine-proton_looni \
   --install-dir ~/tools
 ```
 
@@ -233,8 +252,8 @@ Verified
 Every successful install writes a `.looni-install` file into the tool directory:
 
 ```ini
-installer_version="1.0.0"
-install_date="2026-03-07 21:45:17 UTC"
+installer_version="v1.0.0"
+install_date="2026-03-08 15:00:00 UTC"
 tool_name="wine-proton_looni"
 install_path="/home/user/.steam/steam/compatibilitytools.d/wine-proton_looni"
 install_mode="steam"
@@ -242,6 +261,7 @@ wine_src="/home/user/builds/wine-ge-custom"
 proton_src="/home/user/.steam/steam/compatibilitytools.d/GE-Proton9-20"
 proton_version="GE-Proton9-20"
 protonfixes_src="/home/user/umu-protonfixes"
+wine_unified_wow64="0"
 ```
 
 This file is used by `--uninstall` and is useful for auditing what's installed and reproducing a build.
