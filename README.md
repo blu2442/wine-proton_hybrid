@@ -50,7 +50,7 @@ sudo apt install rsync python3 file yad
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/wine-proton_looni
+git clone https://github.com/blu2442/wine-proton_looni
 cd wine-proton_looni
 chmod +x wine-proton_looni-unified-1.0.0.sh
 ./wine-proton_looni-unified-1.0.0.sh
