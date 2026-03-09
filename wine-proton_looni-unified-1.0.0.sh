@@ -14,7 +14,7 @@ set -euo pipefail
 # All interactive prompts can be bypassed with CLI flags for headless/CI use.
 # ============================================================================
 
-VERSION="1.0.0"
+VERSION="v1.0.0"
 DRY_RUN=0
 VERBOSE=0
 DEBUG=0
@@ -586,6 +586,63 @@ fi
 
 BIN_FILES=$(ls "${WINE_ROOT}/bin" 2>/dev/null | wc -l)
 good "Wine root: $WINE_ROOT  ($BIN_FILES binaries)"
+
+# ── Detect unified WoW64 vs split build ──────────────────────────────────────
+# Wine 10.6+ introduced a "unified WoW64" architecture where a single wine
+# binary handles both 32-bit and 64-bit processes through an internal thunking
+# layer (wow64.dll / wow64cpu.dll). Builds using this architecture have NO
+# separate wine64 binary, or wine64 is just a symlink back to wine.
+#
+# The unified layer has a known issue under the Steam Runtime pressure-vessel
+# container: games with 32-bit launchers (even if the main game is 64-bit)
+# fault at the WoW64 address space boundary (~0x6FFFF...) immediately at
+# process init, triggering the Wine debugger before any game code runs.
+# Split builds (separate wine + wine64) are unaffected.
+WINE_IS_UNIFIED_WOW64=0
+WINE_HAS_WINE64=0
+
+if [ -f "${WINE_ROOT}/bin/wine64" ]; then
+  if [ -L "${WINE_ROOT}/bin/wine64" ]; then
+    # wine64 is a symlink — check if it points back to wine (unified)
+    _target=$(readlink "${WINE_ROOT}/bin/wine64")
+    if [[ "$_target" == "wine" ]] || [[ "$_target" == "./wine" ]]; then
+      WINE_IS_UNIFIED_WOW64=1
+    else
+      WINE_HAS_WINE64=1
+    fi
+    unset _target
+  else
+    WINE_HAS_WINE64=1   # real separate wine64 binary — split build
+  fi
+else
+  WINE_IS_UNIFIED_WOW64=1   # no wine64 at all — unified build
+fi
+
+if [ "$WINE_IS_UNIFIED_WOW64" -eq 1 ]; then
+  printf "\n"
+  warn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  warn "  Unified WoW64 Wine build detected (no separate wine64)"
+  warn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  warn ""
+  warn "  Wine 10.6+ unified WoW64 has a known issue under the Steam"
+  warn "  Runtime: games with 32-bit launchers (even 64-bit games)"
+  warn "  fault at the WoW64 address boundary immediately at launch,"
+  warn "  triggering the Wine debugger before any game code runs."
+  warn "  Symptom: 'Unhandled page fault at 0x00006FFFF...' in logs."
+  warn ""
+  warn "  RECOMMENDED: use a Wine build that ships a real wine64"
+  warn "  binary (split layout), or build Wine with:"
+  warn "    --enable-archs=i386,x86_64"
+  warn ""
+  warn "  You can continue, but affected games will crash at launch."
+  warn "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+  printf "\n"
+  read -rp "  Continue with unified WoW64 build anyway? [y/N]: " _wow64_ans
+  [[ "$_wow64_ans" =~ ^[Yy]$ ]] || { info "Aborted — please use a split Wine build."; exit 0; }
+  printf "\n"
+else
+  good "Wine build: split layout (wine + wine64)  ✓"
+fi
 
 update_progress 7 "Reading Proton version file…" "1/9 • Layout detection"
 
@@ -1244,6 +1301,7 @@ wine_src="${WINE_SRC}"
 proton_src="${PROTON_SRC}"
 proton_version="${PROTON_VERSION}"
 protonfixes_src="${PROTONFIXES_SRC:-none}"
+wine_unified_wow64="${WINE_IS_UNIFIED_WOW64}"
 RECEIPT
 good "Install receipt written: $RECEIPT_FILE"
 
@@ -1605,6 +1663,11 @@ printf "  ${C_BOLD}%-20s${C_RESET} %s\n"  "Tool name:"      "$TOOL_NAME"
 printf "  ${C_BOLD}%-20s${C_RESET} %s\n"  "Installed to:"   "$FINAL_PATH"
 printf "  ${C_BOLD}%-20s${C_RESET} %s\n"  "Proton version:" "$PROTON_VERSION"
 printf "  ${C_BOLD}%-20s${C_RESET} %s\n"  "Install mode:"   "$INSTALL_MODE"
+if [ "$WINE_IS_UNIFIED_WOW64" -eq 1 ]; then
+  printf "  ${C_BOLD}%-20s${C_RESET} ${C_YELLOW}%s${C_RESET}\n"  "Wine WoW64:"  "unified (⚠ 32-bit launcher games may crash)"
+else
+  printf "  ${C_BOLD}%-20s${C_RESET} ${C_GREEN}%s${C_RESET}\n"   "Wine WoW64:"  "split (wine + wine64)  ✓"
+fi
 printf "  ${C_BOLD}%-20s${C_RESET} %s\n"  "Receipt:"        "${FINAL_PATH}/.looni-install"
 echo
 
