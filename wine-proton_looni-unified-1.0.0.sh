@@ -323,6 +323,7 @@ ${C_BOLD}Maintenance:${C_RESET}
 
 ${C_BOLD}Standalone launcher env vars (set before  ./proton run):${C_RESET}
   LOONI_PREFIX          Exact prefix path to use for this game
+                        (default: ~/.wine-proton-pfx shared prefix)
   WINE_USE_START        Set to 1 for launcher-wrapped games (e.g. GTA IV)
   PROTON_LOG            Set to 1 for verbose Wine debug log in /tmp/
   DXVK_HUD             Set to 1 for DXVK overlay
@@ -1394,11 +1395,9 @@ fi
 # Tuneable env vars (set these BEFORE calling ./proton run):
 #
 #   WINEPREFIX    – exact prefix path to use.
-#                   If NOT set, a per-game prefix is auto-derived from the exe
-#                   name: ~/.wine-proton/<ExeName>
-#                   NOTE: if you have WINEPREFIX set globally in ~/.bashrc,
-#                   that will take precedence — unset it from your shell profile
-#                   and let the wrapper manage prefixes instead.
+#                   If NOT set, the shared default prefix is used:
+#                   ~/.wine-proton-pfx
+#                   To isolate a game, use LOONI_PREFIX instead.
 #
 #   WINEARCH      – win64 (default) or win32
 #   PROTON_LOG    – set to "1" to write a full Wine debug log to /tmp/
@@ -1419,16 +1418,15 @@ if [ "$#" -ge 1 ] && [ "$1" = "run" ]; then
   fi
 
   # ── PREFIX RESOLUTION ─────────────────────────────────────────────────────
-  # Important: we intentionally do NOT fall back to a global WINEPREFIX here.
-  # If WINEPREFIX is inherited from the shell (e.g. set in ~/.bashrc), every
-  # game lands in the same prefix and they stomp on each other — which is
-  # exactly what was happening in the logs.
-  #
   # Rules (checked in order):
   #   1. If LOONI_PREFIX is set → use it exactly  (explicit per-run override)
   #   2. If WINEPREFIX is set in the environment AND it doesn't look like it
   #      came from a global default (~/.wine) → honour it with a warning
-  #   3. Otherwise → compute ~/.wine-proton/<ExeName>  (safe default)
+  #   3. Otherwise → use the single shared prefix ~/.wine-proton/default
+  #
+  # A single shared prefix avoids creating a new prefix directory for every
+  # executable launched, which wastes disk space. To isolate a specific game,
+  # set LOONI_PREFIX=/path/to/prefix before running.
   if [ -n "${LOONI_PREFIX:-}" ]; then
     _computed_prefix="$LOONI_PREFIX"
     _prefix_source="LOONI_PREFIX override"
@@ -1436,8 +1434,8 @@ if [ "$#" -ge 1 ] && [ "$1" = "run" ]; then
     _computed_prefix="$WINEPREFIX"
     _prefix_source="WINEPREFIX env (inherited — consider using LOONI_PREFIX instead)"
   else
-    _computed_prefix="${HOME}/.wine-proton/${_exe_basename}"
-    _prefix_source="auto (per-game)"
+    _computed_prefix="${HOME}/.wine-proton-pfx"
+    _prefix_source="auto (shared default)"
   fi
   export WINEPREFIX="$_computed_prefix"
   export WINEARCH="${WINEARCH:-win64}"
@@ -1698,3 +1696,4 @@ echo
 
 update_progress 100 "Complete!"
 finish_progress
+
