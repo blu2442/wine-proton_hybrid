@@ -39,7 +39,7 @@ sudo apt install rsync python3 file yad
 
    > **⚠ Architecture warning:** Wine 10.6+ introduced a "unified WoW64" build where a single `wine` binary handles both 32-bit and 64-bit processes. This has a known crash with games that have 32-bit launchers under the Steam Runtime (page fault at `0x00006FFFF...`, Wine debugger opens immediately). Use a **split build** — one that ships a real `wine64` binary alongside `wine` — until the unified WoW64 layer matures. Build with `--enable-archs=i386,x86_64` if compiling yourself. The installer will detect and warn you if a unified build is provided.
 
-2. **A Proton source** — your existing Proton installation, e.g.:  
+2. **A Proton source** — your existing Proton installation, e.g.:
    `~/.steam/steam/compatibilitytools.d/Proton/`
 
 3. *(Optional)* **A protonfixes directory** — a [protonfixes](https://github.com/nicowillis/protonfixes) or [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) source for per-game fixes. Auto-detected if present alongside your Wine build.
@@ -92,7 +92,7 @@ All prompts can be bypassed with flags:
 |------|-------------|
 | `--wine-src <dir>` | Path to your custom Wine build |
 | `--proton-src <dir>` | Path to Proton/GE-Proton source |
-| `--name <name>` | Tool name (default: `wine-proton_looni`) |
+| `--name <name>` | Tool name (default: `wine-proton`) |
 | `--install-mode <mode>` | `steam` · `steam-pick` · `custom` |
 | `--install-dir <dir>` | Parent directory for custom installs |
 | `--protonfixes-dir <dir>` | protonfixes source (umu-protonfixes, plain checkout, etc.) |
@@ -187,7 +187,7 @@ The fault happens at the WoW64 address space boundary during the launcher's proc
 
 **Fix:** use a Wine build that ships a separate `wine64` binary (split layout). If building Wine yourself, use `--enable-archs=i386,x86_64` instead of the unified `--enable-archs=x86_64` flag. Upstream, TKG, GE, and Valve Software Wine builds that use a true `wine`/`wine64` split layout(not a `wine64` symlink to the main `wine` binary) are unnaffected.  Sometimes, builds will work when building with a unified `wine` binary, but it's very picky about what it likes and most builds past about version 10.6 with a unified binary will not work due to how WoW64 is handled in recent versions of Wine.
 
-This is all because Steam needs a `wine64` binary to function properly within the Steam Runtime environment. If it does not have it or the `wine` binary does not properly handle WoW64 in a way the `wine64` the script makes likes, then the tool will fail on any 32bit process. The script makes `wine64` if it isn't present by copying `wine` as `wine64` in the /files/bin directory of the tool in order for the tool to properly run in Steam, but if it's an incompatible binary, then the way it handles WoW64 causes the copied `wine64` binary to not be able to handle any processes and opens the crash reporter/debugger. 
+This is all because Steam needs a `wine64` binary to function properly within the Steam Runtime environment. If it does not have it or the `wine` binary does not properly handle WoW64 in a way the `wine64` the script makes likes, then the tool will fail on any 32bit process. The script makes `wine64` if it isn't present by copying `wine` as `wine64` in the /files/bin directory of the tool in order for the tool to properly run in Steam, but if it's an incompatible binary, then the way it handles WoW64 causes the copied `wine64` binary to not be able to handle any processes and opens the crash reporter/debugger.
 
 ### EAC / BattlEye
 
