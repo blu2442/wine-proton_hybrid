@@ -32,15 +32,9 @@ sudo apt install rsync python3 file yad
 
 ## What you need before running
 
-1. **A custom Wine build** — a directory containing `bin/wine`. Supported layouts:
-   - Standard: `wine-build/bin/wine`
-   - Wine-TKG: `wine-tkg/files/bin/wine`
-   - Build output: `wine-src/dist/bin/wine`
+1. **A Wine build** — a a root Wine directory containing the /bin, /lib, /include, and /share folders in your existing Wine build. Then of course `wine`/`wine64`. The standard file directory path for `wine`/`wine64` is `wine-build/bin/`.
 
-   > **⚠ Architecture warning:** Wine 10.6+ introduced a "unified WoW64" build where a single `wine` binary handles both 32-bit and 64-bit processes. This has a known crash with games that have 32-bit launchers under the Steam Runtime (page fault at `0x00006FFFF...`, Wine debugger opens immediately). Use a **split build** — one that ships a real `wine64` binary alongside `wine` — until the unified WoW64 layer matures. Build with `--enable-archs=i386,x86_64` if compiling yourself. The installer will detect and warn you if a unified build is provided.
-
-2. **A Proton source** — your existing Proton installation, e.g.:
-   `~/.steam/steam/compatibilitytools.d/Proton/`
+2. **A Proton source** — your existing Proton installation's root directory. The standard file directory path for your Proton tool is usually `~/.steam/steam/compatibilitytools.d/Proton/` if the tool is installed to steam. If it's somewhere else, make sure the root directory has all the proper python files(.py), manifest files(.vdf), version file, and the /files folder containing the rest of the tool's binaries, libraries, and necessary files.
 
 3. *(Optional)* **A protonfixes directory** — a [protonfixes](https://github.com/nicowillis/protonfixes) or [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) source for per-game fixes. Auto-detected if present alongside your Wine build.
 
