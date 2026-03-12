@@ -282,7 +282,7 @@ Issues and PRs welcome. If you have a game that needs a specific fix or a Wine l
 
 ## Credits
 
-Built on top of [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom) by GloriousEggroll, [DXVK](https://github.com/doitsujin/dxvk), [VKD3D-Proton](https://github.com/HansKristian-Work/vkd3d-proton), [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes), and the broader Wine project.
+Built on top of [ValveSoftware](https://github.com/ValveSoftware/wine) [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom), [Wine-TKG](https://github.com/Kron4ek/wine-tkg), [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes), and the broader Wine project.
 
 ---
 
