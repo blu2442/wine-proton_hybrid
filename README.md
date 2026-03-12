@@ -58,7 +58,7 @@ The installer will walk you through source selection, tool naming, and install d
 ### Interactive (default)
 
 ```bash
-./wine-proton_hybrid-v1.0.0
+./wine-proton_hybrid-v1.0.0.sh
 ```
 
 You'll be prompted for:
@@ -201,10 +201,10 @@ This is all because Steam needs a `wine64` binary to function properly within th
 
 ```bash
 # Steam install (auto-detected)
-./wine-proton_hybrid-v1.0.0 --uninstall --name wine-proton
+./wine-proton_hybrid-v1.0.0.sh --uninstall --name wine-proton
 
 # Custom install location
-./wine-proton_hybrid-v1.0.0 --uninstall --name wine-proton \
+./wine-proton_hybrid-v1.0.0.sh --uninstall --name wine-proton \
   --install-dir ~/tools
 ```
 
