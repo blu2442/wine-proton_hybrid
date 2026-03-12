@@ -51,8 +51,8 @@ sudo apt install rsync python3 file yad
 ```bash
 git clone https://github.com/blu2442/wine-proton_hybrid
 cd wine-proton_hybrid
-chmod +x wine-proton_looni-unified-v1.0.0.sh
-./wine-proton_looni-unified-v1.0.0.sh
+chmod +x wine-proton_hybrid-v1.0.0
+./wine-proton_hybrid-v1.0.0
 ```
 
 The installer will walk you through source selection, tool naming, and install destination — all inputs can also be passed as CLI flags for headless use (see below).
@@ -64,7 +64,7 @@ The installer will walk you through source selection, tool naming, and install d
 ### Interactive (default)
 
 ```bash
-./wine-proton_looni-unified-v1.0.0.sh
+./wine-proton_hybrid-v1.0.0
 ```
 
 You'll be prompted for:
@@ -81,7 +81,7 @@ All file pickers appear **before** the build starts, so the progress bar runs un
 All prompts can be bypassed with flags:
 
 ```bash
-./wine-proton_looni-unified-v1.0.0.sh \
+./wine-proton_hybrid-v1.0.0 \
   --wine-src      ~/builds/wine-ge-custom \
   --proton-src    ~/.steam/steam/compatibilitytools.d/GE-Proton9-20 \
   --name          wine-ge-looni \
@@ -205,10 +205,10 @@ The fault happens at the WoW64 address space boundary during the launcher's proc
 
 ```bash
 # Steam install (auto-detected)
-./wine-proton_looni-unified-v1.0.0.sh --uninstall --name wine-proton_looni
+./wine-proton_hybrid-v1.0.0 --uninstall --name wine-proton_looni
 
 # Custom install location
-./wine-proton_looni-unified-v1.0.0.sh --uninstall --name wine-proton_looni \
+./wine-proton_hybrid-v1.0.0 --uninstall --name wine-proton_looni \
   --install-dir ~/tools
 ```
 
