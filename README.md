@@ -32,7 +32,7 @@ sudo apt install rsync python3 file yad
 
 ## What you need before running
 
-1. **A Wine build** — a a root Wine directory containing the /bin, /lib, /include, and /share folders in your existing Wine build. Then of course `wine`/`wine64`. The standard file directory path for `wine`/`wine64` is `wine-build/bin/`.
+1. **A Wine build** — a root Wine directory containing the /bin, /lib, /include, and /share folders in your existing Wine build. Then of course `wine`/`wine64`. The standard file directory path for `wine`/`wine64` is `wine-build/bin/`.
 
 2. **A Proton source** — your existing Proton installation's root directory. The standard file directory path for your Proton tool is usually `~/.steam/steam/compatibilitytools.d/Proton/` if the tool is installed to steam. If it's somewhere else, make sure the root directory has all the proper python files(.py), manifest files(.vdf), version file, and the /files folder containing the rest of the tool's binaries, libraries, and necessary files.
 
