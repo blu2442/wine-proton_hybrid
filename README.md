@@ -75,7 +75,7 @@ All file pickers appear **before** the build starts, so the progress bar runs un
 All prompts can be bypassed with flags:
 
 ```bash
-./wine-proton_hybrid-v1.0.0 \
+./wine-proton_hybrid-v1.0.0.sh \
   --wine-src      ~/builds/Wine \
   --proton-src    ~/.steam/steam/compatibilitytools.d/Proton \
   --name          wine-proton \
