@@ -45,8 +45,8 @@ sudo apt install rsync python3 file yad
 ```bash
 git clone https://github.com/blu2442/wine-proton_hybrid
 cd wine-proton_hybrid
-chmod +x wine-proton_hybrid-v1.0.0
-./wine-proton_hybrid-v1.0.0
+chmod +x wine-proton_hybrid-v1.0.0.sh
+./wine-proton_hybrid-v1.0.0.sh
 ```
 
 The installer will walk you through source selection, tool naming, and install destination — all inputs can also be passed as CLI flags for headless use (see below).
