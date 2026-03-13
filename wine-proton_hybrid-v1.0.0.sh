@@ -9,7 +9,7 @@ set -euo pipefail
 # tool or used standalone via  ./proton run <game.exe>.
 #
 # Usage:
-#   ./wine-proton_looni-unified.sh [OPTIONS]
+#   ./wine-proton_looni-unified-v1.0.0.sh [OPTIONS]
 #
 # All interactive prompts can be bypassed with CLI flags for headless/CI use.
 # ============================================================================
