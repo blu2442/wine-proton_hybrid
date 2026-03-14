@@ -150,8 +150,7 @@ Prefixes are managed per-game automatically. Priority order:
 
 The installer accepts any of the following as a protonfixes source:
 
-- A built [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) repo (includes bundled `unzip`, `cabextract`, `libmspack`)
-- A plain [protonfixes](https://github.com/nicowillis/protonfixes) checkout
+- A built [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes) repo (includes bundled `unzip`, `cabextract`, `libmspack`
 - Any directory containing a `protonfixes/` subfolder or `__init__.py`
 
 Auto-search paths (checked in order):
