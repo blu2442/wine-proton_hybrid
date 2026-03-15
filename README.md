@@ -275,7 +275,7 @@ Issues and PRs welcome. If you have a game that needs a specific fix or a Wine l
 
 ## Credits
 
-Built on top of [WineHQ](https://www.winehq.org), [ValveSoftware](https://github.com/ValveSoftware), [Wine-TKG](https://github.com/Frogging-Family/wine-tkg-git), [Proton-TKG](https://github.com/Kron4ek/proton-archive), [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom), [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes), and the broader Wine project.
+Built on top of [WineHQ](https://www.winehq.org), [ValveSoftware](https://github.com/ValveSoftware), [Wine-TKG](https://github.com/Frogging-Family/wine-tkg-git), [Proton-Kron4ek](https://github.com/Kron4ek/proton-archive), [GE-Proton](https://github.com/GloriousEggroll/proton-ge-custom), [umu-protonfixes](https://github.com/Open-Wine-Components/umu-protonfixes), and the broader Wine project.
 
 ---
 
