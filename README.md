@@ -85,7 +85,7 @@ All prompts can be bypassed with flags:
 | Flag | Description |
 |------|-------------|
 | `--wine-src <dir>` | Path to your custom Wine build |
-| `--proton-src <dir>` | Path to Proton/GE-Proton source |
+| `--proton-src <dir>` | Path to Proton source |
 | `--name <name>` | Tool name (default: `wine-proton`) |
 | `--install-mode <mode>` | `steam` · `steam-pick` · `custom` |
 | `--install-dir <dir>` | Parent directory for custom installs |
