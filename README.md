@@ -89,7 +89,7 @@ All prompts can be bypassed with flags:
 | `--name <name>` | Tool name (default: `wine-proton`) |
 | `--install-mode <mode>` | `steam` · `steam-pick` · `custom` |
 | `--install-dir <dir>` | Parent directory for custom installs |
-| `--protonfixes-dir <dir>` | protonfixes source (umu-protonfixes, plain checkout, etc.) |
+| `--protonfixes-dir <dir>` | protonfixes source |
 | `--dry-run` | Print commands without executing |
 | `--verbose` | Echo every command as it runs |
 | `--debug` | Dump Proton lib/wine layout after install |
